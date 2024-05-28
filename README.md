@@ -1,8 +1,3 @@
-
-## Repository Deprecated
-
-This repository has been deprecated. Please check out the new repository at [https://github.com/AryanKaushal2002/MediPredict](https://github.com/AryanKaushal2002/MediPredict) for the latest updates.
-
 # Multiple Disease Prediction Web App
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -26,8 +21,8 @@ This repository has been deprecated. Please check out the new repository at [htt
 The diseases currently supported by this web app include:
 - Diabetes
 - Parkinson's disease
-- Heart disease
-- Breast cancer
+- Covid 19
+- Autism
 
 ## Web App
 

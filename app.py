@@ -3,12 +3,8 @@ import streamlit as st
 import numpy as np
 from streamlit_option_menu import option_menu 
 import pandas as pd
-import plotly.graph_objects as go
 import plotly.express as px
 import matplotlib.pyplot as plt
-import seaborn as sns
-from prophet import Prophet
-from prophet.plot import plot_plotly
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 

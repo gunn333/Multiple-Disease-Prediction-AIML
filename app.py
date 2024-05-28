@@ -3,15 +3,35 @@ import streamlit as st
 import numpy as np
 from streamlit_option_menu import option_menu 
 import pandas as pd
+import plotly.graph_objects as go
+import plotly.express as px
 import matplotlib.pyplot as plt
+import seaborn as sns
+from prophet import Prophet
+from prophet.plot import plot_plotly
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 
 st.set_page_config(
+    page_title='Multi Disease Predict Streamlit',
+    page_icon='🩺',
     layout='wide'
 )
 
-#Covid-19 Prediction
+# loading the saved models
+diabetes_model = pickle.load(open("./models/diabetes_model.sav",'rb'))
+parkinsons_model = pickle.load(open("./models/parkinsons_model.sav",'rb'))
+lung_cancer_model = pickle.load(open("./models/lung_cancer.sav",'rb'))
+
+# sidebar navigation
+with st.sidebar:
+    selected = option_menu('Multiple Disease Prediction System', 
+                           [ 'Diabetes Prediction','Parkinson\'s Prediction', 'Stroke Prediction', 'Autism Prediction' , 
+                            'Lung Cancer Prediction', 'Covid Prediction' , 'Anemia Prediction'],
+                           icons=['activity','person','','gender-female', 'lungs', 'virus', 'heart'],
+                           default_index=0)
+    
+# Covid-19 Prediction
 df1=pd.read_csv("./dataFiles/Covid-19 Predictions.csv")
 x1=df1.drop("Infected with Covid19",axis=1)
 x1=np.array(x1)
@@ -21,27 +41,8 @@ x1_train,x1_test,y1_train,y1_test=train_test_split(x1,y1,test_size=0.2,random_st
 model1=RandomForestClassifier()
 model1.fit(x1_train,y1_train)
 
-# loading the saved models
-
-diabetes_model = pickle.load(open("./models/diabetes_model.sav",'rb'))
-parkinsons_model = pickle.load(open("./models/parkinsons_model.sav",'rb'))
-lung_cancer_model = pickle.load(open("./models/lung_cancer.sav",'rb'))
-
-# sidebar navigation
-with st.sidebar:
-    
-    selected = option_menu('Multiple Disease Prediction System', 
-                           [ 'Diabetes Prediction',
-                            'Parkinson\'s Prediction',
-                            'Stroke Prediction', 'Autism Prediction' , 'Lung Cancer Prediction', 'Covid Prediction' , 'Anemia Prediction' ],
-                           icons=['activity','person','','gender-female', 'lungs', 'virus', 'heart'],
-                           default_index=0)
-
-
-
 # Diabetes Prediction Page
 if (selected == 'Diabetes Prediction'):
-    
     # page title
     st.title('Diabetes Prediction using ML')
     
@@ -71,12 +72,8 @@ if (selected == 'Diabetes Prediction'):
     
     with col2:
         Age = st.text_input('Age of the Person')
-        
-    # code for prediction
-    diab_diagnosis=''
-    
+          
     # create a button for prediction
-    
     if st.button('Diabetes Test Result'):
         if not all([Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age]):
             st.warning("Please fill in all the fields.")
@@ -84,19 +81,13 @@ if (selected == 'Diabetes Prediction'):
             diab_prediction = diabetes_model.predict([[Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age]])
             
             if (diab_prediction[0] == 1):
-              diab_diagnosis = 'The person is diabetic'
+              st.warning('The person is diabetic')
             else:
-              diab_diagnosis = 'The person is not diabetic'
+              st.success('The person is not diabetic')
         
-    st.success(diab_diagnosis)  
-  
-
-    
-
 
 # Parkinsons Prediction Page  
 if (selected == 'Parkinson\'s Prediction'):    
-    
     # page title
     st.title("Parkinson's Disease Prediction using ML")
     
@@ -168,11 +159,6 @@ if (selected == 'Parkinson\'s Prediction'):
     with col2:
         PPE = st.text_input('PPE')
         
-    
-    
-    # code for Prediction
-    parkinsons_diagnosis = ''
-    
     # creating a button for Prediction    
     if st.button("Parkinson's Test Result"):
         if not all([fo, fhi, flo, Jitter_percent, Jitter_Abs, RAP, PPQ, DDP, Shimmer, Shimmer_dB, APQ3, APQ5, APQ, DDA, NHR, HNR, RPDE, DFA, spread1, spread2, D2, PPE]):
@@ -181,15 +167,13 @@ if (selected == 'Parkinson\'s Prediction'):
             parkinsons_prediction = parkinsons_model.predict([[fo, fhi, flo, Jitter_percent, Jitter_Abs, RAP, PPQ,DDP,Shimmer,Shimmer_dB,APQ3,APQ5,APQ,DDA,NHR,HNR,RPDE,DFA,spread1,spread2,D2,PPE]])                          
             
             if (parkinsons_prediction[0] == 1):
-              parkinsons_diagnosis = "The person has Parkinson's disease"
+              st.warning("The person has Parkinson's disease")
             else:
-              parkinsons_diagnosis = "The person does not have Parkinson's disease"
+              st.success("The person does not have Parkinson's disease")
         
-    st.success(parkinsons_diagnosis)    
 
 
-# Autism
-
+# Autism Prediction Page
 if selected == 'Autism Prediction':
     st.title('Autism Prediction using ML')
     col1, col2, col3, col4 = st.columns(4)
@@ -225,7 +209,7 @@ if selected == 'Autism Prediction':
     result = st.number_input("Result")
     relation = st.selectbox("Relation", relations)
 
-    if st.button("Detect"):
+    if st.button("Autism Test Result"):
         gender = genders.index(gender)
         ethnicity = ethnicities.index(ethnicity)
         relation = relations.index(relation)
@@ -235,6 +219,8 @@ if selected == 'Autism Prediction':
         result1 = find_asd(res1[0])
         st.success(" " + result1)
 
+
+# Stroke Prediction Page
 if selected == 'Stroke Prediction':
 
     st.title('Stroke Prediction using ML')
@@ -296,7 +282,7 @@ if selected == 'Stroke Prediction':
 
     stroke_pred = None
     
-    if st.button('Stroke Prediction'):
+    if st.button('Stroke Test Result'):
         stroke_pred = model_stroke.predict([[gender, age, hypertension, heart_disease, ever_married, Residence_type, avg_glucose_level, bmi, smoking_status, govt_job, never_worked, private, self_employed, children]])
     
     if stroke_pred is not None:
@@ -307,6 +293,8 @@ if selected == 'Stroke Prediction':
             stroke_diag = "you didn't have a stroke"
             st.success(stroke_diag)
 
+
+# Lung Cancer Prediction Page
 if selected == 'Lung Cancer Prediction':
     st.title('Lung Cancer Prediction using ML')
     col1, col2, col3 = st.columns (3)
@@ -341,18 +329,16 @@ if selected == 'Lung Cancer Prediction':
         SWALLOWING_DIFFICULTY = st.number_input ('SWALLOWING DIFFICULTY ? 1 = NO, 2 = YES')
     with col3:
         CHEST_PAIN = st.number_input ('CHEST PAIN ? 1 = NO, 2 = YES')
-        
-    cancer_diagnosis =''
     
-    if st.button('Prediction of Lung Cancer Disease'):
+    if st.button('Lung Cancer Test Result'):
         cancer_prediction = lung_cancer_model.predict([[GENDER,AGE,SMOKING,YELLOW_FINGERS,ANXIETY,PEER_PRESSURE,CHRONIC_DISEASE,FATIGUE ,ALLERGY ,WHEEZING,ALCOHOL_CONSUMING,COUGHING,SHORTNESS_OF_BREATH,SWALLOWING_DIFFICULTY,CHEST_PAIN]])
         if (cancer_prediction [0]==1):
-            cancer_diagnosis = 'The patient does not have lung cancer.'
+            st.warning('The patient does not have lung cancer.')
         else:
-            cancer_diagnosis = 'The patient has lung cancer.'
+            st.success('The patient has lung cancer.')
         
-    st.success(cancer_diagnosis)
 
+# Covid-19 Prediction Page
 if selected == 'Covid Prediction':
     st.title('Covid Prediction using ML')
     st.write("All The Values Should Be In Range Mentioned")
@@ -362,15 +348,13 @@ if selected == 'Covid Prediction':
     breathingprob=st.number_input("Rate Of Breathing Problem (0-20)",min_value=0,max_value=20,step=1)
     prediction1=model1.predict([[drycough,fever,sorethroat,breathingprob]])[0]
 
-    if st.button("Predict"):
+    if st.button("Covid-19 Test Result"):
         if prediction1=="Yes":
             st.warning("The Patient is Affected By Covid-19")
         elif prediction1=="No":
             st.success("The Patient is not Affected By Covid-19")
 
     st.image('covid-19-image.jpg',caption='Covid-19',use_column_width=True)
-    st.write('Developing a COVID-19 prediction web app with Prophet for forecasting, Plotly for interactive visualizations, and Streamlit for a user-friendly interface.')
-
     st.markdown("<br>", unsafe_allow_html=True)
 
 # Data Collection
@@ -391,8 +375,9 @@ if selected == 'Covid Prediction':
                         )
     fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
     st.plotly_chart(fig)
-    st.markdown("<br>", unsafe_allow_html=True)
 
+
+# Anemia Prediction Page
 if selected == 'Anemia Prediction':
     st.title('Anemia Prediction using ML')
     anemia_model = pickle.load(open('./models/anemia_model.sav', 'rb'))
@@ -402,14 +387,9 @@ if selected == 'Anemia Prediction':
     MCHC = st.text_input('Enter the average concentration of hemoglobin')
     MCV = st.text_input('Enter your average red blood cell')
 
-    anemia_diagnosis = ''
-
-    if st.button('Test Prediction'):
+    if st.button('Anemia Test Result'):
         ane_prediction = anemia_model.predict([[Gender, Hemoglobin, MCH, MCHC, MCV]])
         if ane_prediction[0] == 1:
-            anemia_diagnosis = 'The patient has anemia'
+            st.warning('The patient has anemia')
         else:
-            anemia_diagnosis = 'The patient does not have anemia'
-        
-        st.success(anemia_diagnosis)
-    
+            st.success('The patient does not have anemia')

@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 
-*A web application for predicting multiple diseases using machine learning models. This project includes prediction models for diabetes, Parkinson's disease, heart disease, and breast cancer.*
+*A web application for predicting multiple diseases using machine learning models. This project includes prediction models for diabetes, Parkinson's disease,lung cancer, Autism, Stroke, COVID 19 and Anemia*
 
 ## Table of Contents
 
@@ -35,7 +35,7 @@ The diseases currently supported by this web app include:
 
 1. Clone the repository:
 <pre>
-git clone https://github.com/AryanKaushal2002/Multiple-Disease-Prediction-Model-Deployment-using-StreamLit.git
+git clone https://github.com/gunn333/Multiple-Disease-Prediction-AIML.git
 </pre>
 
 
